@@ -7,6 +7,7 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "antd": "^5.24.0",
     "axios": "^1.7.9",
+    "bootstrap": "^5.3.3",
     "cra-template-typescript": "1.2.0",
     "emoji-picker-react": "^4.12.0",
     "iconsax-react": "^0.0.8",
