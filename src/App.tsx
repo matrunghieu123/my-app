@@ -171,15 +171,15 @@ function App() {
               <div style={{ backgroundColor: '#1e3a8a', color: '#fff', padding: '10px', textAlign: 'center', borderRadius: '20px 20px 0 0' }}>
                 <h2>Live chat</h2>
               </div>
-              {isRegistered && (
-                <div style={{ marginBottom: '20px', textAlign: 'center', color: '#888' }}>
-                  Cảm ơn bạn đã cung cấp thông tin
-                  <div style={{ color: '#00f', marginTop: '5px' }}>
-                    {name} | {phone} | {email}
-                  </div>
-                </div>
-              )}
               <div className="messages">
+                {isRegistered && (
+                  <div style={{ marginBottom: '20px', textAlign: 'center', color: '#888' }}>
+                    Cảm ơn bạn đã cung cấp thông tin
+                    <div style={{ color: '#00f', marginTop: '5px' }}>
+                      {name} | {phone} | {email}
+                    </div>
+                  </div>
+                )}
                 {messages.map((msg, index) => (
                   <div key={index} style={{ marginBottom: '10px', textAlign: 'right' }}>
                     {shouldDisplayTimestamp(index) && (
@@ -288,56 +288,56 @@ function App() {
                   </div>
                 )}
               </div>
-            </div>
-            {!isChatVisible && !isRegistered && (
-              <div className="overlay">
-                <div className="user-info-form" style={{ marginTop: '170px' }}>
-                  <div className="header">
-                    <p>Vui lòng cho chúng tôi biết thêm một số thông tin của Quý Khách</p>
-                  </div>
-                  <div style={{ marginBottom: '20px' }}>
-                    <label style={{ display: 'flex', marginBottom: '5px' }}>Tên đầy đủ</label>
-                    <Input
-                      placeholder="Nhập tên đầy đủ"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      style={{ width: '100%' }}
-                    />
-                    {nameError && <div className="error-message">{nameError}</div>}
-                  </div>
-                  <div style={{ marginBottom: '20px' }}>
-                    <label style={{ display: 'flex', marginBottom: '10px' }}>
-                      Số điện thoại <span style={{ color: 'red' }}>*</span>
-                    </label>
-                    <Input
-                      placeholder="Nhập số điện thoại"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      style={{ width: '100%' }}
-                    />
-                    {phoneError && <div className="error-message">{phoneError}</div>}
-                  </div>
-                  <div style={{ marginBottom: '20px' }}>
-                    <label style={{ display: 'flex', marginBottom: '5px' }}>Email</label>
-                    <Input
-                      placeholder="Nhập email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      style={{ width: '100%' }}
-                    />
-                    {emailError && <div className="error-message">{emailError}</div>}
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '30px' }}>
-                    <Button type="primary" onClick={handleOpenChat}>
-                      Gửi thông tin
-                    </Button>
-                    <Button onClick={handleCancelRegistration}>
-                      Để sau
-                    </Button>
+              {!isChatVisible && !isRegistered && (
+                <div className="overlay">
+                  <div className="user-info-form" style={{ marginTop: '170px' }}>
+                    <div className="header">
+                      <p>Vui lòng cho chúng tôi biết thêm một số thông tin của Quý Khách</p>
+                    </div>
+                    <div style={{ marginBottom: '20px' }}>
+                      <label style={{ display: 'flex', marginBottom: '5px' }}>Tên đầy đủ</label>
+                      <Input
+                        placeholder="Nhập tên đầy đủ"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        style={{ width: '100%' }}
+                      />
+                      {nameError && <div className="error-message">{nameError}</div>}
+                    </div>
+                    <div style={{ marginBottom: '20px' }}>
+                      <label style={{ display: 'flex', marginBottom: '10px' }}>
+                        Số điện thoại <span style={{ color: 'red' }}>*</span>
+                      </label>
+                      <Input
+                        placeholder="Nhập số điện thoại"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        style={{ width: '100%' }}
+                      />
+                      {phoneError && <div className="error-message">{phoneError}</div>}
+                    </div>
+                    <div style={{ marginBottom: '20px' }}>
+                      <label style={{ display: 'flex', marginBottom: '5px' }}>Email</label>
+                      <Input
+                        placeholder="Nhập email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        style={{ width: '100%' }}
+                      />
+                      {emailError && <div className="error-message">{emailError}</div>}
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '30px' }}>
+                      <Button type="primary" onClick={handleOpenChat}>
+                        Gửi thông tin
+                      </Button>
+                      <Button onClick={handleCancelRegistration}>
+                        Để sau
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       )}
