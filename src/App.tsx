@@ -130,7 +130,6 @@ function App() {
     if (valid) {
       setIsChatVisible(true);
       setIsRegistered(true);
-      setIsModalVisible(false);
     }
   };
 
