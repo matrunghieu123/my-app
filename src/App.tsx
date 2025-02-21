@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button, Input, Upload } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPhone, faSmile, faPaperclip, faPaperPlane, faTimes, faFile, faFileImage, faFileVideo } from '@fortawesome/free-solid-svg-icons';
@@ -6,6 +6,7 @@ import EmojiPicker from 'emoji-picker-react';
 import './App.css';
 
 function App() {
+  // Khai báo các state để quản lý trạng thái của ứng dụng
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [messages, setMessages] = useState<{ text: string; time: string; images?: string[]; videos?: string[]; files?: { name: string; url: string; type: string }[] }[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -17,17 +18,38 @@ function App() {
   const [phoneError, setPhoneError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [isRegistered, setIsRegistered] = useState<boolean>(false);
+  const [nameError, setNameError] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // useEffect để ẩn chat khi khởi tạo
+  useEffect(() => {
+    setIsChatVisible(false);
+  }, []);
+
+  // useEffect để cuộn đến tin nhắn cuối cùng khi danh sách tin nhắn thay đổi
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Hàm hiển thị modal
   const showModal = () => {
+    console.log('showModal called');
+    console.log('isRegistered:', isRegistered);
     setIsModalVisible(true);
+    if (!isRegistered) {
+      setIsChatVisible(false);
+    }
   };
 
+  // Hàm đóng modal
   const closeModal = () => {
     setIsModalVisible(false);
   };
 
+  // Hàm gửi tin nhắn
   const handleSendMessage = () => {
-    if (!name || !phone) {
+    if (!isRegistered) {
       setIsChatVisible(false);
       return;
     }
@@ -50,12 +72,15 @@ function App() {
     }
   };
 
+  // Hàm xử lý khi input được focus
   const handleInputFocus = () => {
-    if (!name || !phone) {
+    if (!isRegistered) {
       setIsChatVisible(false);
+      setIsModalVisible(true);
     }
   };
 
+  // Hàm xử lý khi chọn emoji
   const handleEmojiClick = (emojiObject: any) => {
     if (emojiObject && emojiObject.emoji) {
       setInputValue(inputValue + emojiObject.emoji);
@@ -63,20 +88,30 @@ function App() {
     setShowEmojiPicker(false);
   };
 
+  // Hàm xử lý khi tải file lên
   const handleFileUpload = (file: File) => {
     setSelectedFiles([...selectedFiles, file]);
     return false;
   };
 
+  // Hàm xử lý khi xóa file
   const handleRemoveFile = (fileToRemove: File) => {
     setSelectedFiles(selectedFiles.filter(file => file !== fileToRemove));
   };
 
+  // Hàm mở chat sau khi kiểm tra thông tin người dùng
   const handleOpenChat = () => {
     const phoneRegex = /^[0-9]{10}$/;
     const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
 
     let valid = true;
+
+    if (!name.trim()) {
+      setNameError('Vui lòng nhập tên!');
+      valid = false;
+    } else {
+      setNameError('');
+    }
 
     if (!phoneRegex.test(phone)) {
       setPhoneError('Số điện thoại phải là số và có 10 chữ số!');
@@ -94,13 +129,17 @@ function App() {
 
     if (valid) {
       setIsChatVisible(true);
+      setIsRegistered(true);
+      setIsModalVisible(false);
     }
   };
 
+  // Hàm hủy đăng ký
   const handleCancelRegistration = () => {
     setIsChatVisible(true);
   };
 
+  // Hàm kiểm tra xem có nên hiển thị timestamp hay không
   const shouldDisplayTimestamp = (index: number) => {
     if (index === 0) return true;
     const currentMessage = messages[index];
@@ -129,12 +168,18 @@ function App() {
               <FontAwesomeIcon icon={faTimes} />
             </button>
             <div className="chat-container">
-              <div style={{ marginBottom: '20px', textAlign: 'center', color: '#888' }}>
-                Cảm ơn bạn đã cung cấp thông tin
-                <div style={{ color: '#00f', marginTop: '5px' }}>
-                  {name} | {phone} | {email}
-                </div>
+              {/* Thêm phần tiêu đề màu xanh đậm */}
+              <div style={{ backgroundColor: '#1e3a8a', color: '#fff', padding: '10px', textAlign: 'center', borderRadius: '20px 20px 0 0' }}>
+                <h2>Live chat</h2>
               </div>
+              {isRegistered && (
+                <div style={{ marginBottom: '20px', textAlign: 'center', color: '#888' }}>
+                  Cảm ơn bạn đã cung cấp thông tin
+                  <div style={{ color: '#00f', marginTop: '5px' }}>
+                    {name} | {phone} | {email}
+                  </div>
+                </div>
+              )}
               <div className="messages">
                 {messages.map((msg, index) => (
                   <div key={index} style={{ marginBottom: '10px', textAlign: 'right' }}>
@@ -175,8 +220,9 @@ function App() {
                     </div>
                   </div>
                 ))}
+                <div ref={messagesEndRef} />
               </div>
-              <div className="file-preview-container" style={{ marginBottom: '10px' }}>
+              <div className="file-preview-container">
                 {selectedFiles.map((file, index) => (
                   <div key={index} style={{
                     display: 'inline-block',
@@ -225,7 +271,7 @@ function App() {
                   onFocus={handleInputFocus}
                   onChange={(e) => setInputValue(e.target.value)}
                   onPressEnter={handleSendMessage}
-                  style={{ fontSize: '16px', height: '40px' }}
+                  style={{ fontSize: '16px', height: '40px', border: 'none', backgroundColor: 'white'}}
                   suffix={
                     <>
                       <FontAwesomeIcon icon={faSmile} style={{ marginRight: 12 }} onClick={() => setShowEmojiPicker(!showEmojiPicker)} />
@@ -244,7 +290,7 @@ function App() {
                 )}
               </div>
             </div>
-            {!isChatVisible && (
+            {!isChatVisible && !isRegistered && (
               <div className="overlay">
                 <div className="user-info-form" style={{ marginTop: '170px' }}>
                   <div className="header">
@@ -258,6 +304,7 @@ function App() {
                       onChange={(e) => setName(e.target.value)}
                       style={{ width: '100%' }}
                     />
+                    {nameError && <div className="error-message">{nameError}</div>}
                   </div>
                   <div style={{ marginBottom: '20px' }}>
                     <label style={{ display: 'flex', marginBottom: '10px' }}>
@@ -269,7 +316,7 @@ function App() {
                       onChange={(e) => setPhone(e.target.value)}
                       style={{ width: '100%' }}
                     />
-                    {phoneError && <div style={{ color: 'red', marginTop: '5px' }}>{phoneError}</div>}
+                    {phoneError && <div className="error-message">{phoneError}</div>}
                   </div>
                   <div style={{ marginBottom: '20px' }}>
                     <label style={{ display: 'flex', marginBottom: '5px' }}>Email</label>
@@ -279,7 +326,7 @@ function App() {
                       onChange={(e) => setEmail(e.target.value)}
                       style={{ width: '100%' }}
                     />
-                    {emailError && <div style={{ color: 'red', marginTop: '5px' }}>{emailError}</div>}
+                    {emailError && <div className="error-message">{emailError}</div>}
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '30px' }}>
                     <Button type="primary" onClick={handleOpenChat}>
